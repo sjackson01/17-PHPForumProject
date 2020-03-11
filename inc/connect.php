@@ -1,10 +1,15 @@
-<?php # Script 17.1 Connection.php
-// This file contains the database access information
-DEFINE('DB_HOST','mysql:3306');
-DEFINE('DB_USER', 'root');
-DEFINE('DB_PASSWORD', 'tiger');
-DEFINE('DB_NAME', 'forum2');
+<?php # Script 9.2 - mysqli_connect.php
 
-$mysqli = new $MySQLi(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+// This file contains the database access information.
+// This file also establishes a connection to MySQL,
+// selects the database, and sets the encoding.
 
-?>
+// Set the database access information as constants:
+define('DB_USER', 'root');
+define('DB_PASSWORD', 'tiger');
+define('DB_HOST', 'mysql:3306');
+define('DB_NAME', 'forum2');
+
+// Make the connection:
+$dbc = @mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME) OR die('Could not connect to MySQL: ' . mysqli_connect_error() );
+
