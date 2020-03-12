@@ -39,8 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){ // Handle the form.
             $q = "INSERT INTO threads (lang_id, user_id, subject) 
             VALUES ({$_SESSION['lid']}, {$_SESSION['user_id']}, '" . mysqli_real_escape_string($dbc, $subject) . "')";
             $r = mysqli_query($dbc, $q);
+            if (mysqli_affected_rows($dbc) == 1) {
+				$tid = mysqli_insert_id($dbc);
+			} else {
+				echo '<p class="bg-danger">Your post could not be handled due to a system error.</p>';
+			}
+		} // No $tid.
 
-            if(mysqli_affected_rows($dbc) === 1){
+		if ($tid) { // Add this to the replies table:
+			$q = "INSERT INTO posts (thread_id, user_id, message, posted_on) VALUES ($tid, {$_SESSION['user_id']}, '" . mysqli_real_escape_string($dbc, $body) . "', UTC_TIMESTAMP())";
+			$r = mysqli_query($dbc, $q);
+			if (mysqli_affected_rows($dbc) == 1) {
                 echo '<p class="bg-success">Your post has been entered.</p>';
             }else{
                 echo '<p class="bg-danger">Your post could not be handled due to a system error.</p>';
@@ -53,3 +62,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){ // Handle the form.
 }else{
     include('inc/post_form.php');
 }
+include('inc/footer.php');
