@@ -3,63 +3,61 @@
 // It also displays the form if creating a new thread.
 include('inc/header.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST'){ // Handle the form.
+if ($_SERVER['REQUEST_METHOD'] == 'POST') { // Handle the form.
 
     // Language ID is in the session.
     // Validate thread ID ($tid), which may not be present:
-    if (isset($_POST['tid']) && filter_var($_POST['tid'], FILTER_VALIDATE_INT, array('min_range' => 1))){
+    if (isset($_POST['tid']) && filter_var($_POST['tid'], FILTER_VALIDATE_INT, array('min_range' => 1))) {
 
         $tid = $_POST['tid'];
-
-    }else{
-        $tid = FALSE; 
+    } else {
+        $tid = FALSE;
     }
 
-    if (!$tid && empty($_POST['subject'])){
+    if (!$tid && empty($_POST['subject'])) {
         $subject = FALSE;
         echo '<p class="bg-danger">Please enter a subject for this post.</p>';
-    }elseif(!$tid && !empty($_POST['subject'])){
+    } elseif (!$tid && !empty($_POST['subject'])) {
         $subject = htmlspecialchars(strip_tags($_POST['subject']));
-    }else{
+    } else {
         $subject = TRUE;
     }
 
     //Validate the body:
-    if (!empty($_POST['body'])){
+    if (!empty($_POST['body'])) {
         $body = htmlentities($_POST['body']);
     } else {
         $body = FALSE;
         echo '<p class="bg-danger">Please enter a body for this post.</p>';
     }
 
-    if ($subject && $body){ //OK
+    if ($subject && $body) { //OK
 
         /// Add the message to the database
-        if(!$tid){ // Create new thread
+        if (!$tid) { // Create new thread
             $q = "INSERT INTO threads (lang_id, user_id, subject) 
             VALUES ({$_SESSION['lid']}, {$_SESSION['user_id']}, '" . mysqli_real_escape_string($dbc, $subject) . "')";
             $r = mysqli_query($dbc, $q);
             if (mysqli_affected_rows($dbc) == 1) {
-				$tid = mysqli_insert_id($dbc);
-			} else {
-				echo '<p class="bg-danger">Your post could not be handled due to a system error.</p>';
-			}
-		} // No $tid.
+                $tid = mysqli_insert_id($dbc);
+            } else {
+                echo '<p class="bg-danger">Your post could not be handled due to a system error.</p>';
+            }
+        } // No $tid.
 
-		if ($tid) { // Add this to the replies table:
-			$q = "INSERT INTO posts (thread_id, user_id, message, posted_on) VALUES ($tid, {$_SESSION['user_id']}, '" . mysqli_real_escape_string($dbc, $body) . "', UTC_TIMESTAMP())";
-			$r = mysqli_query($dbc, $q);
-			if (mysqli_affected_rows($dbc) == 1) {
+        if ($tid) { // Add this to the replies table:
+            $q = "INSERT INTO posts (thread_id, user_id, message, posted_on) VALUES ($tid, {$_SESSION['user_id']}, '" . mysqli_real_escape_string($dbc, $body) . "', UTC_TIMESTAMP())";
+            $r = mysqli_query($dbc, $q);
+            if (mysqli_affected_rows($dbc) == 1) {
                 echo '<p class="bg-success">Your post has been entered.</p>';
-            }else{
+            } else {
                 echo '<p class="bg-danger">Your post could not be handled due to a system error.</p>';
             }
         } // Valid $tid
-    }else{ // Include the form
+    } else { // Include the form
         include('inc/post_form.php');
     }
-
-}else{
+} else {
     include('inc/post_form.php');
 }
 include('inc/footer.php');
