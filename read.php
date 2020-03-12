@@ -41,8 +41,8 @@ if($tid){ // Get the messages in this thread
     while ($messages = mysqli_fetch_array($r, MYSQLI_ASSOC)){
         
         // Only need to print the subject once!
-        if (!$printned){
-            echo "<h1>{$messages ['subject']}</h2>\n";
+        if (!$printed){
+            echo "<h2>{$messages['subject']}</h2>\n";
             $printed = TRUE;
         }
 
